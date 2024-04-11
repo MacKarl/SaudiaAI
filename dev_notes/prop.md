@@ -1,0 +1,76 @@
+| Unique ID | Property          |
+|-----------|-------------------|
+| 1         | Mountain Scenery  |
+| 2         | Local Crafts      |
+| 3         | Traditional Markets |
+| 4         | Festivals         |
+| 5         | Religious         |
+| 6         | Pilgrimage        |
+| 7         | Islamic History   |
+| 8         | Oasis             |
+| 9         | Date Palms        |
+| 10        | Hot Springs       |
+| 11        | Archaeology       |
+| 12        | Rock Formations   |
+| 13        | Ancient Tombs     |
+| 14        | Desert            |
+| 15        | Camel Racing      |
+| 16        | Bedouin Culture   |
+| 17        | Mountains         |
+| 18        | Terraced Farms    |
+| 19        | Dense Forests     |
+| 20        | Adventure         |
+| 21        | Paragliding       |
+| 22        | Off-Roading       |
+| 23        | Coastal           |
+| 24        | Corniche          |
+| 25        | Industrial Heritage |
+| 26        | Agriculture       |
+| 27        | Date Festival     |
+| 28        | Cultural Museums  |
+| 29        | Tropical          |
+| 30        | Mangrove Forests  |
+| 31        | Island Hopping    |
+| 32        | Frontier          |
+| 33        | Border Markets    |
+| 34        | Desert Landscape  |
+| 35        | Heritage          |
+| 36        | Rock Art Sites    |
+| 37        | Desert Gardens    |
+| 38        | Commercial        |
+| 39        | Historic Port     |
+| 40        | Seafront Promenade |
+| 41        | Olive Groves      |
+| 42        | Ancient Castles   |
+| 43        | Ancient           |
+| 44        | Mud-brick Forts   |
+| 45        | Archaeological Sites |
+| 46        | Futuristic        |
+| 47        | Technology Hubs   |
+| 48        | Sustainable Living |
+| 49        | Rural             |
+| 50        | Farming Communities |
+| 51        | Traditional Crafts |
+| 52        | Tranquil          |
+| 53        | Quiet Oases       |
+| 54        | Community Markets |
+| 55        | Capital           |
+| 56        | Skyscrapers       |
+| 57        | Diplomatic Quarters |
+| 58        | Remote            |
+| 59        | Desert Exploration |
+| 60        | Wildlife Reserves |
+| 61        | Historical        |
+| 62        | Crusader Castles  |
+| 63        | Diving Sites      |
+| 64        | Cooler Climate    |
+| 65        | Rose Gardens      |
+| 66        | Mountain Resorts  |
+| 67        | Bedouin Traditions |
+| 68        | Sand Dunes        |
+| 69        | Marine            |
+| 70        | Coral Reefs       |
+| 71        | Luxury Resorts    |
+| 72        | Industrial        |
+| 73        | Port Activities   |
+| 74        | Beach Resorts     |

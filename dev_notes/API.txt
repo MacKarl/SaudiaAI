@@ -1,0 +1,32 @@
+Hi!
+
+Write a sample of API that is a microservice with Redis DB with a pair "thread_id":status_instance
+
+Examples of the instance:
+{
+ "count":int;
+ "status":bull;
+ "interest":index;
+ "city":str_name;
+ "keywords":" keywords in conversation relevant for the context"
+};
+{
+"count": 5,
+"status": true,
+"interest": [26],
+"city": "Riyadh",
+"keywords": "travel duration, Riyadh, explore"
+}
+
+Description:
+count: This is an integer (int) that likely represents the number of interactions or messages exchanged in the conversation so far. This is 
+a tracker of length. You MUST count all messages both from a user and an assistant.
+
+status: This field is labeled as bull, is a typo. Assuming it's meant to be bool (Boolean), it would indicate a true or false value. This represents whether the current state of the conversation is active (true) or if it has concluded/needs redirection (false).
+
+interest: Also indexed, this parameter is designed to capture the user's interests, which could influence suggestions for exploring Saudi Arabia. This could include categories like cultural sites, natural wonders, or events. ONLY INDEXES FROM "properties.csv" ARE ALLOWED. Fill this field from the context of the conversation. NO MORE THAN 3 INTERESTS FOR A USER.
+
+city: Designated by str_name, this field specifies the city within Saudi Arabia that the user is interested in or is traveling to. It's a direct input field for city names. ONLY CITIES FROM "cities_prop.csv" ARE ALLOWED. ONE TO ONE RELATION.
+
+keywords: This string field captures the all relevant keywords from the conversation, aiding in maintaining context and relevancy in responses. 
+
