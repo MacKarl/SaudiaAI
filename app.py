@@ -4,6 +4,7 @@ import time
 import logging
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import redis
 import json
 import openai
@@ -19,6 +20,7 @@ client = openai.OpenAI(
 
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://213.108.105.117"}})
 
 # Connect to Redis
 redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
@@ -115,4 +117,5 @@ def get_response():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
