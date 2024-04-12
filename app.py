@@ -23,7 +23,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://213.108.105.117"}})
 
 # Connect to Redis
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis(host='213.108.105.117', port=6379, db=0, decode_responses=True)
 
 def serialize_data(data):
     """Serialize data to store in Redis."""
