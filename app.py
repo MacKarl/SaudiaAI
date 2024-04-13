@@ -8,7 +8,6 @@ import requests
 
 from db_utils import create_table, save_thread
 
-
 # Load environment variables
 load_dotenv()
 
@@ -16,35 +15,50 @@ load_dotenv()
 create_table()
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 
 client = openai.OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
     organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
-    )
+)
 
 def query_thread(thread_id):
     """Retrieve a thread from the database by ID."""
-    thread = requests.get(f"https://api.openai.com/v1/thread/{thread_id}")
-    return thread
+    logging.info(f"Querying thread with ID: {thread_id}")
+    try:
+        response = requests.get(f"https://api.openai.com/v1/thread/{thread_id}")
+        response.raise_for_status()
+        logging.info("Thread retrieved successfully")
+        return response.json()
+    except requests.RequestException as e:
+        logging.error(f"Failed to retrieve thread: {e}")
+        return None
 
 @app.route('/thread/<thread_id>', methods=['GET'])
 def get_thread(thread_id):
     """Endpoint to retrieve a thread by ID."""
+    logging.info(f"GET request to retrieve thread ID: {thread_id}")
     data = query_thread(thread_id)
     if data is None:
+        logging.warning(f"Thread ID: {thread_id} not found")
         return jsonify({"error": "Thread not found"}), 404
     return jsonify({'thread_id': thread_id, 'data': data})
 
 @app.route('/thread/', methods=['POST'])
 def create_or_update_thread():
     """Endpoint to create or update a thread."""
-    thread = client.beta.threads.create()
-    thread_id = thread.id
-    save_thread(thread_id)
-    return jsonify({"thread_id": thread_id}), 200
+    try:
+        logging.info("Creating or updating a thread")
+        thread = client.beta.threads.create()
+        thread_id = thread['id']
+        save_thread(thread_id)
+        logging.info(f"Thread created or updated with ID: {thread_id}")
+        return jsonify({"thread_id": thread_id}), 200
+    except Exception as e:
+        logging.error(f"Failed to create or update thread: {e}")
+        return jsonify({"error": "Failed to create or update thread"}), 500
 
 @app.route('/response/', methods=['POST'])
 def get_response():
@@ -52,61 +66,41 @@ def get_response():
     thread_id = request.json.get('thread_id', None)
 
     if not thread_id:
+        logging.warning("Thread ID required but not provided")
         return jsonify({'error': 'Thread ID required'}), 400
 
+    logging.info(f"Handling response for thread ID: {thread_id}")
     thread = query_thread(thread_id)
     if not thread:
+        logging.warning(f"Thread ID: {thread_id} not found for response handling")
         return jsonify({'error': 'Thread not found'}), 404
 
     try:
-        # Logic to handle the thread response
-        # Add a message to the thread
         client.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
             content=user_text
         )
-        
-        # Run the Thread
+        logging.info("Message added to thread successfully")
+
         run = client.beta.threads.runs.create_and_poll(
-            thread_id=thread['id'],
+            thread_id=thread_id,
             instructions="Please address the user as Jane Doe. The user has a premium account."
-            )
-        # Wait for the run to complete
-        while run.status != "completed":
+        )
+        logging.info("Thread run created and polling started")
+        
+        while run['status'] != "completed":
             time.sleep(0.2)
-            run = client.beta.threads.runs.retrieve(
-                thread_id=thread['id'],
-                assistant_id=os.environ.get("ASSISTANT_ID"),
-                run_id=run.id
-            )
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
 
-        # Get messages
         response = client.beta.threads.messages.list(thread_id=thread_id)
-
-        # Iterate through the messages in the response
-        for message in response.data:
-            # Check if the message is from the assistant
-            if message.role == 'assistant':
-                # Extract the text content from the message
-                # Assuming there's only one content per message, hence [0]
-                text_content = message.content[0].text.value
-                # Update the last assistant message
-                response_text = text_content
-
+        response_text = [m['content']['text'] for m in response['data'] if m['role'] == 'assistant'][-1]
+        
+        logging.info("Response retrieved from thread successfully")
         return jsonify({"message": response_text})
 
     except Exception as e:
-        sorry_msg = """
-        Oops! It seems we've encountered a bit of a hiccup in our digital universe. 
-        While I reboot my circuits and recalibrate my algorithms, 
-        please take a moment to enjoy the unpredictable beauty of technology. 
-        We'll be back on track faster than you can say 'artificial intelligence'!"
-        Refresh the page and try again!🤖🔧
-        \n\n
-        P.S. We are in beta version, so feel free to contact our developers directly via e-mail tech@iiope.org
-        """
-        logging.error(f"Error processing request: {e}")
+        logging.error(f"Error processing response request: {e}")
         return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
