@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 import openai
 import requests
 
-from db_utils import create_table, save_thread, query_thread
+from db_utils import create_table, save_thread
 
 
 # Load environment variables
