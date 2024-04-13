@@ -93,14 +93,20 @@ def get_response():
             time.sleep(0.2)
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
 
-        response_messages = client.beta.threads.messages.list(thread_id=thread_id)
-        response_text = ''
-        for message in response_messages:
-            if message.role == 'assistant':
-                response_text = message['content']['text']
+        # Get messages
+        response = client.beta.threads.messages.list(thread_id=thread_id)
 
-        logging.info("Response retrieved from thread successfully")
-        return jsonify({"message": response_text})
+        # Iterate through the messages in the response
+        for message in response.data:
+            # Check if the message is from the assistant
+            if message.role == 'assistant':
+                # Extract the text content from the message
+                # Assuming there's only one content per message, hence [0]
+                text_content = message.content[-1].text.value
+                # Update the last assistant message
+                response_text = text_content
+
+        return jsonify({"choices": [{"message": {"content": response_text}}]})
 
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
