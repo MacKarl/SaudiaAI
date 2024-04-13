@@ -16,8 +16,6 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
-create_table()
-
 client = openai.OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
     organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
@@ -104,4 +102,5 @@ def get_response():
         return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)  # Consider removing debug=True for production
+    create_table()  # Ensure the table is created before the app starts
+    app.run(debug=False)  # It's a good practice to turn debug off in production
