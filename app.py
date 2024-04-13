@@ -83,8 +83,9 @@ def get_response():
         logging.info("Message added to thread successfully")
 
         run = client.beta.threads.runs.create_and_poll(
+            assistant_id=os.environ.get("OPENAI_ASSISTANT_ID"),
             thread_id=thread_id,
-            instructions="Please address the user as Jane Doe. The user has a premium account."
+            instructions="Please address the user as Arabian from Saudi Arabia or UAE. The user has a premium account."
         )
         logging.info("Thread run created and polling started")
         
