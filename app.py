@@ -66,7 +66,7 @@ def get_thread(thread_id):
 @app.route('/thread/', methods=['POST'])
 def create_or_update_thread():
     """Endpoint to create or update a thread."""
-    thread_object = openai.Thread.create()
+    thread_object = client.beta.threads.create()
     thread_id = thread_object['id']
     save_thread(thread_id, thread_object)
     return jsonify({"thread_id": thread_id}), 200
@@ -79,8 +79,8 @@ def get_response():
     if not thread_id:
         return jsonify({'error': 'Thread ID required'}), 400
 
-    thread_object = query_thread(thread_id)
-    if not thread_object:
+    thread = query_thread(thread_id)
+    if not thread:
         return jsonify({'error': 'Thread not found'}), 404
 
     try:
@@ -91,21 +91,21 @@ def get_response():
             role="user",
             content=user_text
         )
-
+        
         # Run the Thread
-        run_response = client.beta.threads.runs.create(
-            thread_id=thread_id,
-            assistant_id=os.environ.get("ASSISTANT_ID"),
-        )
         run_id = run_response.id
-
-        # Wait for the run to complete
-        while run_response.status != "completed":
-            run_response = client.beta.threads.runs.retrieve(
-                thread_id=thread_id,
-                run_id=run_id
+        run = client.beta.threads.runs.create_and_poll(
+            thread_id=thread.id,
+            instructions="Please address the user as Jane Doe. The user has a premium account."
             )
+        # Wait for the run to complete
+        while run.status != "completed":
             time.sleep(0.2)
+            run = client.beta.threads.runs.retrieve(
+                thread_id=thread.id,
+                assistant_id=os.environ.get("ASSISTANT_ID"),
+                run_id=run.id
+            )
 
         # Get messages
         response = client.beta.threads.messages.list(thread_id=thread_id)
