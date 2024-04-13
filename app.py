@@ -71,7 +71,7 @@ def get_response():
     logging.info(f"Handling response for thread ID: {thread_id}")
     thread = query_thread(thread_id)
     if not thread:
-        logging.warning(f"Thread ID: {thread_id} not found for response handling. {thread}")
+        logging.warning(f"Thread ID: {thread_id} not found for response handling")
         return jsonify({'error': 'Thread not found'}), 404
 
     try:
@@ -83,19 +83,21 @@ def get_response():
         logging.info("Message added to thread successfully")
 
         run = client.beta.threads.runs.create_and_poll(
-            assistant_id=os.environ.get("ASSISTANT_ID"),
             thread_id=thread_id,
-            instructions="Please address the user as Arabian from Saudi Arabia or UAE. The user has a premium account."
+            instructions="Please address the user as Jane Doe. The user has a premium account."
         )
         logging.info("Thread run created and polling started")
         
         while run.status != "completed":
             time.sleep(0.2)
-            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
 
-        response = client.beta.threads.messages.list(thread_id=thread_id)
-        response_text = [m['content']['text'] for m in response['data'] if m['role'] == 'assistant'][-1]
-        
+        response_messages = client.beta.threads.messages.list(thread_id=thread_id)
+        response_text = ''
+        for message in response_messages:
+            if message.role == 'assistant':
+                response_text = message['content']['text']
+
         logging.info("Response retrieved from thread successfully")
         return jsonify({"message": response_text})
 
