@@ -52,10 +52,14 @@ def get_thread(thread_id):
 
 @app.route('/thread/<thread_id>/messages/', methods=['GET'])
 def get_messages(thread_id):
-    
     logging.info(f"Querying thread with ID: {thread_id}")
-    response = requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages')
-    return jsonify(response.json())
+    try:
+        response = requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages')
+        logging.info("Thread messages retrieved successfully")
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        logging.error(f"Failed to retrieve thread messages: {e}")
+        return jsonify({"error": "Failed to retrieve thread messages"}), 500
 
 @app.route('/thread/', methods=['POST'])
 def create_or_update_thread():
