@@ -95,7 +95,10 @@ def get_response():
 
         # Get messages
         response = client.beta.threads.messages.list(thread_id=thread_id)
-
+        last_msg = client.beta.threads.messages.retrieve(message_id=response.last_id, thread_id=thread_id)
+        
+        response_text = last_msg.content[0].text.value
+        """
         # Iterate through the messages in the response
         for message in response.data:
             # Check if the message is from the assistant
@@ -106,7 +109,7 @@ def get_response():
                 # Update the last assistant message
                 response_text = text_content
                 break
-        
+        """
         return jsonify({"choices": [{"message": {"content": response_text}}]})
 
     except Exception as e:
