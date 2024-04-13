@@ -2,68 +2,89 @@ import os
 from dotenv import load_dotenv
 import time
 import logging
-
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-import redis
 import json
 import openai
-
+import sqlite3
 
 # Load environment variables
 load_dotenv()
 
-# Initialize the OpenAI client
-client = openai.OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
-
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://213.108.105.117"}})
 
-# Connect to Redis
-redis_client = redis.Redis(host='213.108.105.117', port=6379, db=0, decode_responses=True)
+def get_db_connection():
+    """Establish a new database connection."""
+    conn = sqlite3.connect('database.db')
+    return conn
 
-def serialize_data(data):
-    """Serialize data to store in Redis."""
-    return json.dumps(data)
+def create_table():
+    """Create the database table if it doesn't exist."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS threads (
+            thread_id TEXT PRIMARY KEY,
+            json_instance TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-def deserialize_data(data):
-    """Deserialize data retrieved from Redis."""
-    return json.loads(data)
+def save_thread(thread_id, json_instance):
+    """Save a thread to the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT OR REPLACE INTO threads (thread_id, json_instance)
+        VALUES (?, ?)
+    ''', (thread_id, json.dumps(json_instance)))
+    conn.commit()
+    conn.close()
+
+def query_thread(thread_id):
+    """Retrieve a thread from the database by ID."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT json_instance FROM threads WHERE thread_id = ?
+    ''', (thread_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return json.loads(result[0]) if result else None
 
 @app.route('/thread/<thread_id>', methods=['GET'])
 def get_thread(thread_id):
     """Endpoint to retrieve a thread by ID."""
-    data = redis_client.get(thread_id)
+    data = query_thread(thread_id)
     if data is None:
         return jsonify({"error": "Thread not found"}), 404
-    return jsonify({thread_id: deserialize_data(data)})
+    return jsonify({'thread_id': thread_id, 'data': data})
 
 @app.route('/thread/', methods=['POST'])
-def create_or_update_thread(thread_id):
+def create_or_update_thread():
     """Endpoint to create or update a thread."""
-    # Validate data here (omitted for brevity)
-    thread_object = client.beta.threads.create()
-    thread_id = thread_object.id
-    # Store data in Redis
-    redis_client.set(thread_id, serialize_data(thread_object))
-    return jsonify({"thread_id": f"{thread_id}"}), 200
-
+    thread_object = openai.Thread.create()
+    thread_id = thread_object['id']
+    save_thread(thread_id, thread_object)
+    return jsonify({"thread_id": thread_id}), 200
 
 @app.route('/response/', methods=['POST'])
 def get_response():
     user_text = request.json.get('prompt')
-    thread_id = request.json.get('thread_id')
+    thread_id = request.json.get('thread_id', None)
 
-    if thread_id is not None:
-        thread_object = client.beta.threads.create()
-        thread_id = thread_object.id
-    else:
-        return jsonify({'error': 'Bad request'}), 400
+    if not thread_id:
+        return jsonify({'error': 'Thread ID required'}), 400
+
+    thread_object = query_thread(thread_id)
+    if not thread_object:
+        return jsonify({'error': 'Thread not found'}), 404
 
     try:
+        # Logic to handle the thread response
         # Add a message to the thread
         client.beta.threads.messages.create(
             thread_id=thread_id,
@@ -112,10 +133,12 @@ def get_response():
         P.S. We are in beta version, so feel free to contact our developers directly via e-mail tech@iiope.org
         """
         logging.error(f"Error processing request: {e}")
-        return jsonify({"message": sorry_msg}), 500
-
-
+        return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
+    )
+    create_table()
+    app.run(debug=True)  # Consider removing debug=True for production
