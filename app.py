@@ -102,7 +102,7 @@ def get_response():
             if message.role == 'assistant':
                 # Extract the text content from the message
                 # Assuming there's only one content per message, hence [0]
-                text_content = message.content[-1].text.value
+                text_content = message.content[0].text.value
                 # Update the last assistant message
                 response_text = text_content
 
