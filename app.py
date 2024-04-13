@@ -37,7 +37,7 @@ def get_thread(thread_id):
 def create_or_update_thread():
     """Endpoint to create or update a thread."""
     thread = client.beta.threads.create()
-    thread_id = thread.id
+    thread_id = thread['id']
     save_thread(thread_id)
     return jsonify({"thread_id": thread_id}), 200
 
@@ -64,14 +64,14 @@ def get_response():
         
         # Run the Thread
         run = client.beta.threads.runs.create_and_poll(
-            thread_id=thread.id,
+            thread_id=thread['id'],
             instructions="Please address the user as Jane Doe. The user has a premium account."
             )
         # Wait for the run to complete
         while run.status != "completed":
             time.sleep(0.2)
             run = client.beta.threads.runs.retrieve(
-                thread_id=thread.id,
+                thread_id=thread['id'],
                 assistant_id=os.environ.get("ASSISTANT_ID"),
                 run_id=run.id
             )
