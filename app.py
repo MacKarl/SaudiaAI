@@ -111,7 +111,7 @@ def get_response():
                 response_text = text_content
                 break
         """
-        return response
+        return jsonify({"data": response})
 
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
