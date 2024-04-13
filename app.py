@@ -11,6 +11,9 @@ from db_utils import create_table, save_thread, query_thread
 # Load environment variables
 load_dotenv()
 
+# Ensure the table is created before the app starts
+create_table()
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -102,5 +105,4 @@ def get_response():
         return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    create_table()  # Ensure the table is created before the app starts
     app.run(debug=False)  # It's a good practice to turn debug off in production
