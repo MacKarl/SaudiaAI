@@ -47,7 +47,7 @@ def create_or_update_thread():
     """Endpoint to create or update a thread."""
     try:
         thread = client.beta.threads.create()
-        thread_id = thread['id']
+        thread_id = thread.id
         save_thread(thread_id, thread)
         return jsonify({"thread_id": thread_id}), 200
     except Exception as e:
