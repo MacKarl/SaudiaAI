@@ -5,6 +5,7 @@ import logging
 from flask import Flask, request, jsonify
 import openai
 import requests
+import json
 
 from db_utils import create_table, save_thread
 
@@ -23,6 +24,10 @@ client = openai.OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
     organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
 )
+
+def serelize_data(data):
+    """Serialize the data to JSON."""
+    return json.dumps(data)
 
 def query_thread(thread_id):
     """Retrieve a thread from the database by ID."""
@@ -44,6 +49,13 @@ def get_thread(thread_id):
         logging.warning(f"Thread ID: {thread_id} not found")
         return jsonify({"error": "Thread not found"}), 404
     return jsonify({'thread_id': thread_id, 'data': data})
+
+@app.route('/thread/<thread_id>/messages/', methods=['GET'])
+def get_messages(thread_id):
+    
+    logging.info(f"Querying thread with ID: {thread_id}")
+    response = requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages')
+    return jsonify(response.json())
 
 @app.route('/thread/', methods=['POST'])
 def create_or_update_thread():
@@ -94,8 +106,11 @@ def get_response():
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
 
         # Get messages
-        response = client.beta.threads.messages.list(thread_id=thread_id)
+        response = get_messages(thread_id) #client.beta.threads.messages.list(thread_id=thread_id)
+
         """
+        serelized_response = serelize_data(response)
+        
         last_msg = client.beta.threads.messages.retrieve(message_id=response.last_id, thread_id=thread_id)
         
         response_text = last_msg.content[0].text.value
@@ -111,7 +126,7 @@ def get_response():
                 response_text = text_content
                 break
         """
-        return jsonify({"data": response})
+        return jsonify({"data": response}), 200
 
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
