@@ -4,6 +4,7 @@ import time
 import logging
 from flask import Flask, request, jsonify
 import openai
+import requests
 
 from db_utils import create_table, save_thread, query_thread
 
@@ -24,6 +25,10 @@ client = openai.OpenAI(
     organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
     )
 
+def query_thread(thread_id):
+    """Retrieve a thread from the database by ID."""
+    thread = requests.get(f"https://api.openai.com/v1/thread/{thread_id}")
+    return thread
 
 @app.route('/thread/<thread_id>', methods=['GET'])
 def get_thread(thread_id):
@@ -37,7 +42,7 @@ def get_thread(thread_id):
 def create_or_update_thread():
     """Endpoint to create or update a thread."""
     thread = client.beta.threads.create()
-    thread_id = thread['id']
+    thread_id = thread.id
     save_thread(thread_id)
     return jsonify({"thread_id": thread_id}), 200
 

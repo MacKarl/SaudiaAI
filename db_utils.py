@@ -34,13 +34,4 @@ def save_thread(thread_id, json_instance={'test': 'test'}):
     conn.commit()
     conn.close()
 
-def query_thread(thread_id):
-    """Retrieve a thread from the database by ID."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT json_instance FROM threads WHERE thread_id = ?
-    ''', (thread_id,))
-    result = cursor.fetchone()
-    conn.close()
-    return json.loads(result[0]) if result else None
+
