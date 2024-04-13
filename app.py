@@ -105,7 +105,8 @@ def get_response():
                 text_content = message.content[0].text.value
                 # Update the last assistant message
                 response_text = text_content
-
+                break
+        
         return jsonify({"choices": [{"message": {"content": response_text}}]})
 
     except Exception as e:
