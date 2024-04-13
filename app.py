@@ -85,13 +85,13 @@ def get_response():
 
         run = client.beta.threads.runs.create_and_poll(
             thread_id=thread_id,
-            instructions="Please address the user as Jane Doe. The user has a premium account."
+            instructions="Please address the user as Arabian from Saudi Arabia or UAE. The user has a premium account."
         )
         logging.info("Thread run created and polling started")
         
-        while run['status'] != "completed":
+        while run.status != "completed":
             time.sleep(0.2)
-            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
 
         response = client.beta.threads.messages.list(thread_id=thread_id)
         response_text = [m['content']['text'] for m in response['data'] if m['role'] == 'assistant'][-1]
@@ -102,6 +102,7 @@ def get_response():
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
         return jsonify({"message": "Internal server error"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=False)  # It's a good practice to turn debug off in production
