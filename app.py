@@ -72,7 +72,7 @@ def get_response():
     logging.info(f"Handling response for thread ID: {thread_id}")
     thread = query_thread(thread_id)
     if not thread:
-        logging.warning(f"Thread ID: {thread_id} not found for response handling")
+        logging.warning(f"Thread ID: {thread_id} not found for response handling. {thread}")
         return jsonify({'error': 'Thread not found'}), 404
 
     try:
