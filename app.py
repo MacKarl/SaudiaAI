@@ -29,7 +29,6 @@ def query_thread(thread_id):
     logging.info(f"Querying thread with ID: {thread_id}")
     try:
         response = requests.get(f"https://api.openai.com/v1/thread/{thread_id}")
-        response.raise_for_status()
         logging.info("Thread retrieved successfully")
         return response.json()
     except requests.RequestException as e:
