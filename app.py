@@ -15,6 +15,11 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
+client = openai.OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
+    )
+
 def get_db_connection():
     """Establish a new database connection."""
     conn = sqlite3.connect('database.db')
@@ -136,9 +141,5 @@ def get_response():
         return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    client = openai.OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
-    organization=os.environ.get("OPENAI_ORGANIZATION_ID"),
-    )
     create_table()
     app.run(debug=True)  # Consider removing debug=True for production
