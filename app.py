@@ -52,7 +52,7 @@ def create_or_update_thread():
     try:
         logging.info("Creating or updating a thread")
         thread = client.beta.threads.create()
-        thread_id = thread['id']
+        thread_id = thread.id
         save_thread(thread_id)
         logging.info(f"Thread created or updated with ID: {thread_id}")
         return jsonify({"thread_id": thread_id}), 200
