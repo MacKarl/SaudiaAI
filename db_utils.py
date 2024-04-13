@@ -8,15 +8,20 @@ def get_db_connection():
 
 def create_table():
     """Create the database table if it doesn't exist."""
-    with get_db_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS threads (
-                    thread_id TEXT PRIMARY KEY,
-                    json_instance TEXT
-                )
-            ''')
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS threads (
+                thread_id TEXT PRIMARY KEY,
+                json_instance TEXT
+            )
+        ''')
         conn.commit()
+    finally:
+        cursor.close()
+        conn.close()
+
 
 def save_thread(thread_id, json_instance={'test': 'test'}):
     """Save a thread to the database."""
