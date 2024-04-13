@@ -38,7 +38,7 @@ def create_table():
     conn.commit()
     conn.close()
 
-def save_thread(thread_id, json_instance):
+def save_thread(thread_id, json_instance={'test': 'test'}):
     """Save a thread to the database."""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -73,7 +73,7 @@ def create_or_update_thread():
     """Endpoint to create or update a thread."""
     thread = client.beta.threads.create()
     thread_id = thread.id
-    save_thread(thread_id, thread)
+    save_thread(thread_id)
     return jsonify({"thread_id": thread_id}), 200
 
 @app.route('/response/', methods=['POST'])
