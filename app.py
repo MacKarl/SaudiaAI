@@ -71,9 +71,9 @@ def get_thread(thread_id):
 @app.route('/thread/', methods=['POST'])
 def create_or_update_thread():
     """Endpoint to create or update a thread."""
-    thread_object = client.beta.threads.create()
-    thread_id = thread_object['id']
-    save_thread(thread_id, thread_object)
+    thread = client.beta.threads.create()
+    thread_id = thread.id
+    save_thread(thread_id, thread)
     return jsonify({"thread_id": thread_id}), 200
 
 @app.route('/response/', methods=['POST'])
@@ -98,7 +98,6 @@ def get_response():
         )
         
         # Run the Thread
-        run_id = run_response.id
         run = client.beta.threads.runs.create_and_poll(
             thread_id=thread.id,
             instructions="Please address the user as Jane Doe. The user has a premium account."
