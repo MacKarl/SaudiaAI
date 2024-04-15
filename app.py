@@ -67,7 +67,7 @@ def get_messages(thread_id):
         last_message_text = last_msg.content[0].text.value if last_msg.content else "No content"
         """
         assistant_messages = [msg for msg in thread_messages.data if msg.role == 'assistant']
-        last_assistant_message = assistant_messages[-1] if assistant_messages else None
+        last_assistant_message = assistant_messages[0] if assistant_messages else None
         last_assistant_message_text = last_assistant_message.content[0].text.value if last_assistant_message.content else "No content"
         
         # Changed access to properties of the last_msg object
@@ -95,7 +95,7 @@ def create_or_update_thread():
         logging.error(f"Failed to create or update thread: {e}")
         return jsonify({"error": "Failed to create or update thread"}), 500
 
-@app.route('/response/', methods=['POST'])
+@app.route('/add_message/', methods=['POST'])
 def get_response():
     user_text = request.json.get('prompt')
     thread_id = request.json.get('thread_id', None)
