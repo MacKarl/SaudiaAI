@@ -111,9 +111,9 @@ def get_response():
 
         # Get messages
         response = get_messages(thread_id) #client.beta.threads.messages.list(thread_id=thread_id)
-
-        serelized_response = serelize_data(response)
         """
+        serelized_response = serelize_data(response)
+        
         
         last_msg = client.beta.threads.messages.retrieve(message_id=response.last_id, thread_id=thread_id)
         
@@ -130,7 +130,7 @@ def get_response():
                 response_text = text_content
                 break
         """
-        return jsonify({"data": serelized_response}), 200
+        return jsonify({"data": response}), 200
 
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
