@@ -67,13 +67,14 @@ def get_messages(thread_id):
         last_message_text = last_msg.content[0].text.value if last_msg.content else "No content"
         """
         assistant_messages = [msg for msg in thread_messages.data if msg.role == 'assistant']
-        the_last_assistant_message = assistant_messages[0] if assistant_messages else None
+        last_assistant_message = assistant_messages[0] if assistant_messages else None
+        last_assistant_message_text = last_assistant_message.content[0].text.value if last_assistant_message.content else "No content"
         
         # Changed access to properties of the last_msg object
 
         return jsonify({
             "full_thread": [msg.to_dict() for msg in thread_messages.data],  # Assuming there's a method to convert each Message object to a dictionary
-            "the_last_assistant_message": the_last_assistant_message
+            "the_last_assistant_message": last_assistant_message_text
         }), 200
     except Exception as e:
         logging.error(f"Failed to retrieve thread messages: {e}")
