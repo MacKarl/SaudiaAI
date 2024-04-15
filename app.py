@@ -67,7 +67,7 @@ def get_messages(thread_id):
         last_message_text = last_msg.content[0].text.value if last_msg.content else "No content"
         """
         assistant_messages = [msg for msg in thread_messages.data if msg.role == 'assistant']
-        the_last_assistant_message = assistant_messages[-1] if assistant_messages else None
+        the_last_assistant_message = assistant_messages[0] if assistant_messages else None
         
         # Changed access to properties of the last_msg object
 
