@@ -60,15 +60,20 @@ def get_messages(thread_id):
             raise ValueError("No messages found for the thread")
 
         # Assuming thread_messages.data is a list and the last message is the last element
+        """
         last_msg_id = thread_messages.data[-1].id  # Changed from dictionary access to attribute access
         last_msg = client.beta.threads.messages.retrieve(message_id=last_msg_id, thread_id=thread_id)
 
-        # Changed access to properties of the last_msg object
         last_message_text = last_msg.content[0].text.value if last_msg.content else "No content"
+        """
+        assistant_messages = [msg for msg in thread_messages.data if msg.role == 'assistant']
+        the_last_assistant_message = assistant_messages[-1] if assistant_messages else None
+        
+        # Changed access to properties of the last_msg object
 
         return jsonify({
             "full_thread": [msg.to_dict() for msg in thread_messages.data],  # Assuming there's a method to convert each Message object to a dictionary
-            "last_message": last_message_text
+            "the_last_assistant_message": the_last_assistant_message
         }), 200
     except Exception as e:
         logging.error(f"Failed to retrieve thread messages: {e}")
