@@ -54,13 +54,23 @@ def get_thread(thread_id):
 def get_messages(thread_id):
     logging.info(f"Querying thread with ID: {thread_id}")
     try:
-        thread_messages = client.beta.threads.messages.list(thread_id=thread_id) #requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages/')
+        thread_messages = client.beta.threads.messages.list(thread_id=thread_id)
         logging.info("Thread messages retrieved successfully")
-        last_msg = client.beta.threads.messages.retrieve(message_id=thread_messages.data["last_id"], thread_id=thread_id,)
-        return jsonify({"full_thread":thread_messages.data, "last_message":last_msg.content[0].text.value}), 200
-    except requests.RequestException as e:
+        if not thread_messages.data:
+            raise ValueError("No messages found for the thread")
+
+        # Assuming thread_messages.data is a list and the last message is the last element
+        last_msg_id = thread_messages.data[-1]['id']
+        last_msg = client.beta.threads.messages.retrieve(message_id=last_msg_id, thread_id=thread_id)
+
+        return jsonify({
+            "full_thread": thread_messages.data,
+            "last_message": last_msg.content[0].text.value
+        }), 200
+    except Exception as e:
         logging.error(f"Failed to retrieve thread messages: {e}")
         return jsonify({"error": "Failed to retrieve thread messages"}), 500
+
 
 @app.route('/thread/', methods=['POST'])
 def create_or_update_thread():
