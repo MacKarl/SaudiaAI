@@ -54,9 +54,9 @@ def get_thread(thread_id):
 def get_messages(thread_id):
     logging.info(f"Querying thread with ID: {thread_id}")
     try:
-        response = requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages')
+        response = requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages/')
         logging.info("Thread messages retrieved successfully")
-        return jsonify(response.json())
+        return jsonify(response)
     except requests.RequestException as e:
         logging.error(f"Failed to retrieve thread messages: {e}")
         return jsonify({"error": "Failed to retrieve thread messages"}), 500
