@@ -54,9 +54,10 @@ def get_thread(thread_id):
 def get_messages(thread_id):
     logging.info(f"Querying thread with ID: {thread_id}")
     try:
-        response = requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages/')
+        thread_messages = client.beta.threads.messages.list(thread_id=thread_id) #requests.get(f'https://api.openai.com/v1/threads/{thread_id}/messages/')
         logging.info("Thread messages retrieved successfully")
-        return jsonify(response)
+        last_msg = client.beta.threads.messages.retrieve(message_id=thread_messages.data["last_id"], thread_id=thread_id,)
+        return jsonify({"full_thread":thread_messages.data, "last_message":last_msg.content[0].text.value}), 200
     except requests.RequestException as e:
         logging.error(f"Failed to retrieve thread messages: {e}")
         return jsonify({"error": "Failed to retrieve thread messages"}), 500
@@ -91,7 +92,7 @@ def get_response():
         return jsonify({'error': 'Thread not found'}), 404
 
     try:
-        client.beta.threads.messages.create(
+        message = client.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
             content=user_text
@@ -110,8 +111,10 @@ def get_response():
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
 
         # Get messages
-        response = get_messages(thread_id) #client.beta.threads.messages.list(thread_id=thread_id)
+        response = "Messages have added and run successfully" #get_messages(thread_id) #client.beta.threads.messages.list(thread_id=thread_id)
         """
+        last_msg = client.beta.threads.messages.retrieve(message_id=response.last_id, thread_id=thread_id,)
+        
         serelized_response = serelize_data(response)
         
         
@@ -130,7 +133,7 @@ def get_response():
                 response_text = text_content
                 break
         """
-        return jsonify({"data": response}), 200
+        return jsonify({"status": response}), 201
 
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
