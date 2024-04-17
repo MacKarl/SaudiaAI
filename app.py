@@ -127,7 +127,7 @@ def get_response():
         
         while run.status != "completed":
             time.sleep(0.2)
-            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run.id)
 
         # Get messages
         response = "Messages have added and run successfully"
