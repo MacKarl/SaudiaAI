@@ -130,34 +130,12 @@ def get_response():
             run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run['id'])
 
         # Get messages
-        response = "Messages have added and run successfully" #get_messages(thread_id) #client.beta.threads.messages.list(thread_id=thread_id)
-        """
-        last_msg = client.beta.threads.messages.retrieve(message_id=response.last_id, thread_id=thread_id,)
-        
-        serelized_response = serelize_data(response)
-        
-        
-        last_msg = client.beta.threads.messages.retrieve(message_id=response.last_id, thread_id=thread_id)
-        
-        response_text = last_msg.content[0].text.value
-        
-        # Iterate through the messages in the response
-        for message in response.data:
-            # Check if the message is from the assistant
-            if message.role == 'assistant':
-                # Extract the text content from the message
-                # Assuming there's only one content per message, hence [0]
-                text_content = message.content[0].text.value
-                # Update the last assistant message
-                response_text = text_content
-                break
-        """
+        response = "Messages have added and run successfully"
         return jsonify({"status": response}), 201
 
     except Exception as e:
         logging.error(f"Error processing response request: {e}")
         return jsonify({"message": "Internal server error"}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=False)  # It's a good practice to turn debug off in production
