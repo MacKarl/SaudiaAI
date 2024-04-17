@@ -139,4 +139,4 @@ def get_response():
         return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=False)  # It's a good practice to turn debug off in production
+    app.run(debug=True)
