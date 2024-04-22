@@ -6,7 +6,6 @@ from flask import Flask, request, jsonify
 import openai
 from openai import AsyncOpenAI
 
-import asyncio
 import requests
 import json
 
@@ -141,4 +140,4 @@ async def get_response():
         return jsonify({"message": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    asyncio.run(app.run(debug=True))
+    app.run(debug=True)
