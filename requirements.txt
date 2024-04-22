@@ -4,3 +4,4 @@ openai
 gunicorn
 requests
 asyncio
+Flask[async]
