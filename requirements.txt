@@ -3,3 +3,4 @@ python-dotenv
 openai
 gunicorn
 requests
+asyncio
