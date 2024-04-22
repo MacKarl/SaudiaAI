@@ -7,4 +7,6 @@ asyncio
 Flask[async]
 
 gunicorn
+uvicorn
 uvicorn[standard]
+fastapi
