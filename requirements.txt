@@ -5,3 +5,6 @@ gunicorn
 requests
 asyncio
 Flask[async]
+
+gunicorn
+uvicorn[standard]
